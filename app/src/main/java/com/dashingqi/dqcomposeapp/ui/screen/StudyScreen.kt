@@ -6,6 +6,8 @@ package com.dashingqi.dqcomposeapp.ui.screen
  * @time : 2023/8/26 12:53
  */
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -23,11 +24,13 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LeadingIconTab
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +44,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.dashingqi.dqcomposeapp.ui.components.DQTopAppbar
 import com.dashingqi.dqcomposeapp.viewmodel.MainViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -112,23 +116,50 @@ fun StudyScreen(vm: MainViewModel = viewModel()) {
                 })
             }
         }
-        HorizontalPager(
-            state = rememberPagerState {
+
+        Box() {
+
+            val pagerState = rememberPagerState {
                 vm.bannerItems.size
-            }, pageSpacing = 8.dp, modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .clip(
-                    RoundedCornerShape(8.dp)
+            }
+
+            // 当前页面的位置
+            val pageIndex = pagerState.currentPage
+
+            val pageCoroutine = rememberCoroutineScope()
+
+            HorizontalPager(
+                state = pagerState, pageSpacing = 8.dp, modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .clip(
+                        RoundedCornerShape(8.dp)
+                    )
+            ) {
+                AsyncImage(
+                    model = vm.bannerItems[it].bannerImg,
+                    null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(7 / 3f),
+                    contentScale = ContentScale.FillBounds
                 )
-        ) {
-            AsyncImage(
-                model = vm.bannerItems[it].bannerImg,
-                null,
+            }
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(7 / 3f),
-                contentScale = ContentScale.Crop
-            )
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                vm.bannerItems.forEachIndexed { index, mainBannerEntity ->
+                    RadioButton(selected = index == pageIndex, onClick = {
+                        pageCoroutine.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    })
+                }
+
+            }
         }
     }
 
