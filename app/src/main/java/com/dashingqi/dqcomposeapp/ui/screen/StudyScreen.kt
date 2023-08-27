@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
@@ -110,26 +112,24 @@ fun StudyScreen(vm: MainViewModel = viewModel()) {
                 })
             }
         }
-
-        // 轮播图
-//        HorizontalPager(
-//            state = ,
-//            pageSpacing = 8.dp,
-//            modifier = Modifier
-//                .padding(horizontal = 8.dp)
-//                .clip(
-//                    RoundedCornerShape(8.dp)
-//                )
-//        ) {
-//            AsyncImage(
-//                model = vm.bannerItems[it].bannerImg,
-//                null,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .aspectRatio(7 / 3f),
-//                contentScale = ContentScale.Crop
-//            )
-//        }
+        HorizontalPager(
+            state = rememberPagerState {
+                vm.bannerItems.size
+            }, pageSpacing = 8.dp, modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .clip(
+                    RoundedCornerShape(8.dp)
+                )
+        ) {
+            AsyncImage(
+                model = vm.bannerItems[it].bannerImg,
+                null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(7 / 3f),
+                contentScale = ContentScale.Crop
+            )
+        }
     }
 
 }
